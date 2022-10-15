@@ -1,0 +1,38 @@
+{
+  "include": [
+    "*.d.ts",
+    "./lib/**/*.ts",
+    "./lib/**/*.tsx",
+    "./pages/**/*.ts",
+    "./pages/**/*.tsx",
+    "./components/**/*.ts",
+    "./components/**/*.tsx"
+  ],
+  "compilerOptions": {
+    "jsx": "preserve",
+    "types": [
+      "jest"
+    ],
+    "baseUrl": ".",
+    "target": "ES2022",
+    "esModuleInterop": true,
+    "moduleResolution": "node",
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "noEmit": true,
+    "incremental": true,
+    "module": "esnext",
+    "resolveJsonModule": true,
+    "isolatedModules": true
+  },
+  "exclude": [
+    "node_modules"
+  ]
+}

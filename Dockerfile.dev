@@ -1,0 +1,18 @@
+ARG VERSION=16.14.2
+
+FROM node:$VERSION AS build
+
+ENV APP /opt/app
+
+WORKDIR $APP
+
+COPY package.json .
+COPY package-lock.json .
+
+RUN npm install
+
+COPY . .
+
+ENTRYPOINT ["npm", "run"]
+CMD ["dev"]
+  
