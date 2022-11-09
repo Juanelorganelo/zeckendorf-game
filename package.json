@@ -11,10 +11,15 @@
     "lint:css": "stylelint \"app/**/*.{ts,tsx}\""
   },
   "dependencies": {
+    "@types/invariant": "^2.2.35",
+    "@types/ramda": "^0.28.17",
     "clsx": "^1.2.1",
+    "daisyui": "^2.31.0",
     "mnemonist": "^0.39.3",
     "next": "^12.2.3",
+    "ramda": "^0.28.0",
     "react": "^18.2.0",
+    "react-daisyui": "^2.4.3",
     "usehooks-ts": "^2.9.1"
   },
   "devDependencies": {
