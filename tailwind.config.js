@@ -1,3 +1,5 @@
+const PRIMARY = '#3178c6'
+
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [
@@ -7,5 +9,11 @@ module.exports = {
     'node_modules/react-daisyui/dist/**/*.js',
   ],
   theme: {
+    extend: {
+      colors: {
+        primary: PRIMARY,
+      },
+    },
+  },
   plugins: [require('daisyui')],
 }
