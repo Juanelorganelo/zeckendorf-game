@@ -16,6 +16,7 @@
     "@types/react": "^18.0.25",
     "clsx": "^1.2.1",
     "daisyui": "^2.31.0",
+    "invariant": "^2.2.4",
     "mnemonist": "^0.39.3",
     "next": "^12.2.3",
     "ramda": "^0.28.0",
