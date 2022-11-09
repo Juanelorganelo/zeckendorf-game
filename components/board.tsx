@@ -1,3 +1,4 @@
+import React from 'react'
 import { useElementSize } from 'usehooks-ts'
 
 const DEFAULT_MAX_ITEMS_PER_ROW = 4
