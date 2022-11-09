@@ -1,10 +1,16 @@
-import { createBoard, type Board } from '..'
+import { createBoard, type Board, type Table } from '..'
 
 // Populate the board.
 // Ignore the return values
-function populate(board: Board) {
-  while (board.next()) {
-    // noop
+function forEachTable(
+  board: Board,
+  callback: (table: Table, index: number) => void,
+) {
+  let table: Table | null
+  let index = 0
+
+  while ((table = board.next())) {
+    callback(table, index++)
   }
 }
 
@@ -39,36 +45,6 @@ test.each([
   }
 })
 
-test('throws if choosing from an empty board', () => {
-  const board = createBoard(10)
-  expect(() => board.choose(1)).toThrowError(
-    'Attempted to choose a table from an empty board. Did you forget to call next()?',
-  )
-})
-
-test('throws if choosing in non-increasing order', () => {
-  const board = createBoard(10)
-
-  populate(board)
-
-  expect(() => {
-    board.choose(2)
-    board.choose(1)
-  }).toThrow(
-    'Invalid selection order. Board tables must be chosen in increasing index order',
-  )
-})
-
-test('throws if choosing a non-existent table an empty board', () => {
-  const board = createBoard(10)
-  const outOfBoundIdx = board.length + 1
-
-  populate(board)
-  expect(() => board.choose(outOfBoundIdx)).toThrowError(
-    `Index out of bounds. Attempted to choose table ${outOfBoundIdx} for a board of length ${board.length}`,
-  )
-})
-
 test.each([
   [5, [3]],
   [4, [0, 2]],
@@ -77,9 +53,10 @@ test.each([
 ])('guesses $guess if tables are chosen correctly', (guess, tables) => {
   const board = createBoard(10)
 
-  populate(board)
-  tables.forEach((i) => {
-    board.choose(i)
+  forEachTable(board, (_, index) => {
+    if (tables.includes(index)) {
+      board.choose()
+    }
   })
 
   expect(board.guess()).toBe(guess)

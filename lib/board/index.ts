@@ -1,4 +1,4 @@
-import LinkedList from 'mnemonist/linked-list'
+import invariant from 'invariant'
 import { zeckendorf, uniqueFibonaccisLessThan } from './fibonacci'
 
 export type Table = number[]
@@ -6,19 +6,22 @@ export type Table = number[]
 export interface Board {
   next(): Table | null
   guess(): number
-  choose(index: number): void
+  choose(): void
   readonly length: number
 }
 
 export function createBoard(max: number): Board {
-  let cursor = 0
-  let length = 0
-  const chosen = new LinkedList<number>()
+  let index = 0
+  const chosen = new Set<number>()
   const factors: number[] = []
   const fibonaccis = uniqueFibonaccisLessThan(max)
 
   function next(): Table | null {
-    const fib = fibonaccis[cursor]
+    if (index > fibonaccis.length) {
+      return null
+    }
+
+    const fib = fibonaccis[index]
     const table = [fib]
 
     for (let i = fib + 1; i <= max; i++) {
@@ -29,48 +32,32 @@ export function createBoard(max: number): Board {
       }
     }
 
-    cursor++
-    length++
+    index++
     factors.push(fib)
-    return cursor > fibonaccis.length ? null : table
+    return table
   }
 
   function guess(): number {
-    const indices = chosen.toArray()
+    const indices = Array.from(chosen)
     return indices.reduce((sum, index) => {
       const factor = factors[index]
       return sum + factor
     }, 0)
   }
 
-  function choose(index: number): void {
-    const prev = chosen.last()
+  function choose(): void {
+    invariant(
+      index > 0,
+      `Attempted to choose a table from an empty board. Did you forget to call next()?`,
+    )
 
-    if (cursor === 0) {
-      throw new Error(
-        `Attempted to choose a table from an empty board. Did you forget to call next()?`,
-      )
-    }
-
-    if (prev && index < prev) {
-      throw new Error(
-        `Invalid selection order. Board tables must be chosen in increasing index order`,
-      )
-    }
-
-    if (index >= length) {
-      throw new Error(
-        `Index out of bounds. Attempted to choose table ${index} for a board of length ${length}`,
-      )
-    }
-
-    chosen.push(index)
+    chosen.add(index - 1)
   }
 
   return {
     next,
     guess,
     choose,
-    length,
+    length: index,
   }
 }
