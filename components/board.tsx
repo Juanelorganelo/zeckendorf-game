@@ -27,7 +27,7 @@ export const Board: React.FC<BoardProps> = ({
             flexBasis: Math.floor(containerWidth / numberOfCols),
           }}
           tabIndex={-1}
-          className="font-bold cursor-pointer border border-solid select-none flex items-center justify-center"
+          className="font-bold border border-solid select-none flex items-center justify-center"
         >
           {value}
         </span>
