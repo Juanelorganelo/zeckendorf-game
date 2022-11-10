@@ -1,5 +1,11 @@
 {
   "files.associations": {
     "*.css": "tailwindcss"
-  }
+  },
+  "cSpell.words": [
+    "clsx",
+    "Fibonaccis",
+    "usehooks",
+    "zeckendorf"
+  ]
 }
