@@ -1,0 +1,12 @@
+invariant
+ramda
+react
+clsx
+daisyui
+invariant
+mnemonist
+next
+ramda
+react
+react-daisyui
+usehooks-ts

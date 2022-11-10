@@ -8,7 +8,7 @@
     "./pages/**/*.tsx",
     "./components/**/*.ts",
     "./components/**/*.tsx"
-  ],
+, "scripts/cspell-dictionaries.mts"  ],
   "compilerOptions": {
     "jsx": "preserve",
     "types": [

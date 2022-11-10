@@ -1,0 +1,21 @@
+{
+  "dictionaries": [
+    "scopes",
+    "dependencies",
+    "dev-dependencies"
+  ],
+  "dictionaryDefinitions": [
+    {
+      "name": "scopes",
+      "path": "./.cspell/dictionaries/scopes.txt"
+    },
+    {
+      "name": "dependencies",
+      "path": "./.cspell/dictionaries/dependencies.txt"
+    },
+    {
+      "name": "dev-dependencies",
+      "path": "./.cspell/dictionaries/dev-dependencies.txt"
+    }
+  ]
+}
