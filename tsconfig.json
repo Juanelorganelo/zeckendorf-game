@@ -1,6 +1,7 @@
 {
   "include": [
     "*.d.ts",
+    "./scripts/**/*.ts",
     "./lib/**/*.ts",
     "./lib/**/*.tsx",
     "./pages/**/*.ts",
@@ -11,7 +12,8 @@
   "compilerOptions": {
     "jsx": "preserve",
     "types": [
-      "jest"
+      "jest",
+      "node"
     ],
     "baseUrl": ".",
     "target": "ES2022",
@@ -30,7 +32,7 @@
     "incremental": true,
     "module": "esnext",
     "resolveJsonModule": true,
-    "isolatedModules": true
+    "sourceMap": true
   },
   "exclude": [
     "node_modules"
