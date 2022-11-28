@@ -1,0 +1,13 @@
+invariant
+ramda
+react
+clsx
+daisyui
+immutable
+mnemonist
+next
+ramda
+react
+react-daisyui
+remeda
+usehooks-ts

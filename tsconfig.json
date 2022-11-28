@@ -1,17 +1,19 @@
 {
   "include": [
     "*.d.ts",
+    "./scripts/**/*.ts",
     "./lib/**/*.ts",
     "./lib/**/*.tsx",
     "./pages/**/*.ts",
     "./pages/**/*.tsx",
     "./components/**/*.ts",
     "./components/**/*.tsx"
-  ],
+, "scripts/cspell-dictionaries.mts"  ],
   "compilerOptions": {
     "jsx": "preserve",
     "types": [
-      "jest"
+      "jest",
+      "node"
     ],
     "baseUrl": ".",
     "target": "ES2022",
@@ -30,7 +32,7 @@
     "incremental": true,
     "module": "esnext",
     "resolveJsonModule": true,
-    "isolatedModules": true
+    "sourceMap": true
   },
   "exclude": [
     "node_modules"

@@ -4,5 +4,11 @@
   },
   "files.watcherExclude": {
     "**/target": true
-  }
+  },
+  "cSpell.words": [
+    "clsx",
+    "Fibonaccis",
+    "usehooks",
+    "zeckendorf"
+  ]
 }
