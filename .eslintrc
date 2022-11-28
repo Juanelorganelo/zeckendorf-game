@@ -19,13 +19,19 @@
       "parserOptions": {
         "project": "./tsconfig.json"
       },
-      "plugins": ["@typescript-eslint", "prettier"],
+      "plugins": ["@typescript-eslint", "functional", "prettier"],
       "extends": [
         "next",
         "plugin:@typescript-eslint/recommended",
         "plugin:@typescript-eslint/recommended-requiring-type-checking",
-        "plugin:prettier/recommended"
-      ]
+        "plugin:prettier/recommended",
+        "plugin:functional/external-recommended",
+        "plugin:functional/stylistic"
+      ],
+      "rules": {
+        "@typescript-eslint/no-empty-interface": "off",
+        "@typescript-eslint/no-empty-function": ["error", { "allow": ["constructors"] }]
+      }
     }
   ]
 }

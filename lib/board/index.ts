@@ -1,63 +1,52 @@
-import invariant from 'invariant'
+import * as A from 'lib/functional/array'
+import * as O from 'lib/functional/option'
+import * as R from 'lib/functional/result'
+
+import { type Result } from 'lib/functional/result'
+
+import { filter, pipe, range } from 'remeda'
 import { zeckendorf, uniqueFibonaccisLessThan } from './fibonacci'
 
-export type Table = number[]
+export type Table = readonly number[]
 
-export interface Board {
-  next(): Table | null
-  guess(): number
-  choose(): void
-  readonly length: number
+class TableOutOfBoundsError extends Error {
+  constructor(readonly index: number) {
+    super(`Table index ${index} out of bounds`)
+  }
 }
 
-export function createBoard(max: number): Board {
-  let index = 0
-  const chosen = new Set<number>()
-  const factors: number[] = []
-  const fibonaccis = uniqueFibonaccisLessThan(max)
-
-  function next(): Table | null {
-    if (index > fibonaccis.length) {
-      return null
-    }
-
-    const fib = fibonaccis[index]
-    const table = [fib]
-
-    for (let i = fib + 1; i <= max; i++) {
-      const zs = zeckendorf(i)
-
-      if (zs.includes(fib)) {
-        table.push(i)
-      }
-    }
-
-    index++
-    factors.push(fib)
-    return table
+class TableAlreadyFilledError extends Error {
+  constructor(readonly index: number) {
+    super(`Table index ${index} already filled`)
   }
+}
+export type BoardError = TableOutOfBoundsError | TableAlreadyFilledError
 
-  function guess(): number {
-    const indices = Array.from(chosen)
-    return indices.reduce((sum, index) => {
-      const factor = factors[index]
-      return sum + factor
-    }, 0)
-  }
+export function table(max: number, index: number): Result<Table, BoardError> {
+  const fibs = uniqueFibonaccisLessThan(max)
 
-  function choose(): void {
-    invariant(
-      index > 0,
-      `Attempted to choose a table from an empty board. Did you forget to call next()?`,
-    )
+  return pipe(
+    A.get(fibs, index),
+    O.fold(
+      () => R.err(new TableOutOfBoundsError(index)),
+      (n) => {
+        const xs = range(n, max)
+        return R.ok(filter(xs, (x) => A.includes(zeckendorf(x), n)))
+      },
+    ),
+  )
+}
 
-    chosen.add(index - 1)
-  }
+export function zeckendorfSum(tables: readonly Table[]): number {
+  return A.fold(tables, 0, (a, b) =>
+    O.fold(
+      A.head(b),
+      () => a,
+      (f) => a + f,
+    ),
+  )
+}
 
-  return {
-    next,
-    guess,
-    choose,
-    length: index,
-  }
+interface BoardState {
+  readonly tables: readonly Table[]
 }

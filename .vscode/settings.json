@@ -1,5 +1,8 @@
 {
   "files.associations": {
     "*.css": "tailwindcss"
+  },
+  "files.watcherExclude": {
+    "**/target": true
   }
 }
