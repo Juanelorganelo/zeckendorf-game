@@ -1,34 +1,27 @@
-class Ok<A> {
-  constructor(readonly value: A) {}
+import { type Variant } from './variant'
+
+export interface Success<A> extends Variant<'Success'> {
+  readonly value: A
 }
 
-class Err<E extends Error> {
-  constructor(readonly value: E) {}
+export interface Failure<E> extends Variant<'Failure'> {
+  readonly error: E
 }
 
-export { type Ok, type Err }
+export type Try<E extends Error, A> = Success<A> | Failure<E>
 
-export type Try<A, E extends Error> = Ok<A> | Err<E>
-
-export function ok<A>(value: A): Try<A, never> {
-  return new Ok(value)
+export function ok<E extends Error, A>(value: A): Try<E, A> {
+  return { variant: 'Success', value }
 }
 
-export function err<E extends Error>(value: E): Try<never, E> {
-  return new Err(value)
+export function err<E extends Error, A>(value: E): Try<E, A> {
+  return { variant: 'Failure', error: value }
 }
 
-export function raise<A, E extends Error>(t: Try<A, E>): never | A {
-  if (isErr(t)) {
-    throw t.value
-  }
-  return t.value
-}
-
-export function tryCatch<A, E extends Error>(
+export function tryCatch<E extends Error, A>(
   f: () => A,
   onError: <F extends Error>(e: F) => E,
-): Try<A, E> {
+): Try<E, A> {
   try {
     return ok(f())
   } catch (e) {
@@ -41,54 +34,146 @@ export function tryCatch<A, E extends Error>(
   }
 }
 
-export function isOk<A, E extends Error>(result: Try<A, E>): result is Ok<A> {
-  return result instanceof Ok
+export function isSuccess<E extends Error, A>(
+  result: Try<E, A>,
+): result is Success<A> {
+  return result.variant === 'Success'
 }
 
-export function isErr<A, E extends Error>(result: Try<A, E>): result is Err<E> {
-  return result instanceof Err
+export function isFailure<E extends Error, A>(
+  result: Try<E, A>,
+): result is Failure<E> {
+  return result.variant === 'Failure'
 }
 
-function _map<A, E extends Error, B>(
+const _map =
+  <E extends Error, A, B>(f: (a: A) => B) =>
+  (result: Try<E, A>): Try<E, B> =>
+    isSuccess(result) ? ok(f(result.value)) : result
+export function map<E extends Error, A, B>(
   f: (a: A) => B,
-  result: Try<A, E>,
-): Try<B, E> {
-  return isOk(result) ? new Ok(f(result.value)) : result
-}
-export function map<A, E extends Error, B>(
-  result: Try<A, E>,
+  result: Try<E, A>,
+): Try<E, B>
+export function map<E extends Error, A, B>(
   f: (a: A) => B,
-): Try<B, E>
-export function map<A, E extends Error, B>(
-  f: (a: A) => B,
-): (result: Try<A, E>) => Try<B, E>
-export function map<A, E extends Error, B>(
-  fOrResult: ((a: A) => B) | Try<A, E>,
-  f?: (a: A) => B,
-): Try<B, E> | ((result: Try<A, E>) => Try<B, E>) {
-  return f
-    ? _map(f, fOrResult as Try<A, E>)
-    : (result: Try<A, E>) => _map(fOrResult as (a: A) => B, result)
+): (result: Try<E, A>) => Try<E, B>
+export function map<E extends Error, A, B>(f: (a: A) => B, result?: Try<E, A>) {
+  return result === undefined ? _map(f) : _map(f)(result)
 }
 
-function _flatMap<A, E extends Error, B>(
-  f: (a: A) => Try<B, E>,
-  result: Try<A, E>,
-): Try<B, E> {
-  return isOk(result) ? f(result.value) : result
+const _flatMap =
+  <E extends Error, A, B>(f: (a: A) => Try<E, B>) =>
+  (result: Try<E, A>): Try<E, B> =>
+    isSuccess(result) ? f(result.value) : result
+export function flatMap<E extends Error, A, B>(
+  f: (a: A) => Try<E, B>,
+  result: Try<E, A>,
+): Try<E, B>
+export function flatMap<E extends Error, A, B>(
+  f: (a: A) => Try<E, B>,
+): (result: Try<E, A>) => Try<E, B>
+export function flatMap<E extends Error, A, B>(
+  f: (a: A) => Try<E, B>,
+  result?: Try<E, A>,
+) {
+  return result === undefined ? _flatMap(f) : _flatMap(f)(result)
 }
-export function flatMap<A, E extends Error, B>(
-  result: Try<A, E>,
-  f: (a: A) => Try<B, E>,
-): Try<B, E>
-export function flatMap<A, E extends Error, B>(
-  f: (a: A) => Try<B, E>,
-): (result: Try<A, E>) => Try<B, E>
-export function flatMap<A, E extends Error, B>(
-  fOrResult: ((a: A) => Try<B, E>) | Try<A, E>,
-  f?: (a: A) => Try<B, E>,
-): Try<B, E> | ((result: Try<A, E>) => Try<B, E>) {
-  return f
-    ? _flatMap(f, fOrResult as Try<A, E>)
-    : (result: Try<A, E>) => _flatMap(fOrResult as (a: A) => Try<B, E>, result)
+
+const _fold =
+  <E extends Error, A, B>(f: (e: E) => B, g: (a: A) => B) =>
+  (result: Try<E, A>): B =>
+    isSuccess(result) ? g(result.value) : f(result.error)
+export function fold<E extends Error, A, B>(
+  f: (e: E) => B,
+  g: (a: A) => B,
+  result: Try<E, A>,
+): B
+export function fold<E extends Error, A, B>(
+  f: (e: E) => B,
+  g: (a: A) => B,
+): (result: Try<E, A>) => B
+export function fold<E extends Error, A, B>(
+  f: (e: E) => B,
+  g: (a: A) => B,
+  result?: Try<E, A>,
+) {
+  return result === undefined ? _fold(f, g) : _fold(f, g)(result)
+}
+
+const _mapError =
+  <E extends Error, F extends Error, A>(f: (e: E) => F) =>
+  (result: Try<E, A>): Try<F, A> =>
+    isSuccess(result) ? result : err(f(result.error))
+export function mapError<E extends Error, F extends Error, A>(
+  f: (e: E) => F,
+  result: Try<E, A>,
+): Try<F, A>
+export function mapError<E extends Error, F extends Error, A>(
+  f: (e: E) => F,
+): (result: Try<E, A>) => Try<F, A>
+export function mapError<E extends Error, F extends Error, A>(
+  f: (e: E) => F,
+  result?: Try<E, A>,
+) {
+  return result === undefined ? _mapError(f) : _mapError(f)(result)
+}
+
+const _orElse =
+  <E extends Error, F extends Error, A>(f: (e: E) => Try<F, A>) =>
+  (result: Try<E, A>): Try<F, A> =>
+    isSuccess(result) ? result : f(result.error)
+export function orElse<E extends Error, F extends Error, A>(
+  f: (e: E) => Try<F, A>,
+  result: Try<E, A>,
+): Try<F, A>
+export function orElse<E extends Error, F extends Error, A>(
+  f: (e: E) => Try<F, A>,
+): (result: Try<E, A>) => Try<F, A>
+export function orElse<E extends Error, F extends Error, A>(
+  f: (e: E) => Try<F, A>,
+  result?: Try<E, A>,
+) {
+  return result === undefined ? _orElse(f) : _orElse(f)(result)
+}
+
+const _filter =
+  <E extends Error, A>(f: (a: A) => boolean, error: E) =>
+  (result: Try<E, A>): Try<E, A> =>
+    isSuccess(result) && f(result.value) ? result : err(error)
+export function filter<E extends Error, A>(
+  f: (a: A) => boolean,
+  error: E,
+  result: Try<E, A>,
+): Try<E, A>
+export function filter<E extends Error, A>(
+  f: (a: A) => boolean,
+  error: E,
+): (result: Try<E, A>) => Try<E, A>
+export function filter<E extends Error, A>(
+  f: (a: A) => boolean,
+  error: E,
+  result?: Try<E, A>,
+) {
+  return result === undefined ? _filter(f, error) : _filter(f, error)(result)
+}
+
+const _reject =
+  <E extends Error, A>(f: (a: A) => boolean, error: E) =>
+  (result: Try<E, A>): Try<E, A> =>
+    isSuccess(result) && !f(result.value) ? result : err(error)
+export function reject<E extends Error, A>(
+  f: (a: A) => boolean,
+  error: E,
+  result: Try<E, A>,
+): Try<E, A>
+export function reject<E extends Error, A>(
+  f: (a: A) => boolean,
+  error: E,
+): (result: Try<E, A>) => Try<E, A>
+export function reject<E extends Error, A>(
+  f: (a: A) => boolean,
+  error: E,
+  result?: Try<E, A>,
+) {
+  return result === undefined ? _reject(f, error) : _reject(f, error)(result)
 }

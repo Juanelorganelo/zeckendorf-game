@@ -1,2 +1,2 @@
-export type Unit = void
-export const unit: Unit = undefined
+export type Unit = typeof unit
+export const unit = Symbol('unit')

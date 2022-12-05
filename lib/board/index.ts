@@ -1,10 +1,9 @@
-import * as A from 'lib/functional/array'
+import { fromArray } from 'lib/functional/list'
 import * as O from 'lib/functional/option'
-import * as R from 'lib/functional/result'
 
-import { type Result } from 'lib/functional/result'
+import { type Result, ok, err } from 'lib/functional/result'
 
-import { filter, pipe, range } from 'remeda'
+import { range } from 'remeda'
 import { zeckendorf, uniqueFibonaccisLessThan } from './fibonacci'
 
 export type Table = readonly number[]
@@ -22,28 +21,24 @@ class TableAlreadyFilledError extends Error {
 }
 export type BoardError = TableOutOfBoundsError | TableAlreadyFilledError
 
-export function table(max: number, index: number): Result<Table, BoardError> {
+export function table(max: number, index: number): Result<BoardError, Table> {
   const fibs = uniqueFibonaccisLessThan(max)
+  const current = list(fibs).get(index)
 
-  return pipe(
-    A.get(fibs, index),
-    O.fold(
-      () => R.err(new TableOutOfBoundsError(index)),
-      (n) => {
-        const xs = range(n, max)
-        return R.ok(filter(xs, (x) => A.includes(zeckendorf(x), n)))
-      },
-    ),
-  )
+  return current.match({
+    None: () => err(new TableOutOfBoundsError(index)),
+    Some: (n) => ok(range(n, max).filter((x) => zeckendorf(n).includes(x))),
+  })
 }
 
 export function zeckendorfSum(tables: readonly Table[]): number {
-  return A.fold(tables, 0, (a, b) =>
-    O.fold(
-      A.head(b),
-      () => a,
-      (f) => a + f,
-    ),
+  return list(tables).fold(0, (a, b) =>
+    list(b)
+      .head()
+      .match({
+        None: () => a,
+        Some: (x) => a + x,
+      }),
   )
 }
 
