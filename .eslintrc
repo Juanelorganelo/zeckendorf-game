@@ -31,7 +31,8 @@
       "rules": {
         "@typescript-eslint/ban-types": "off",
         "@typescript-eslint/no-empty-interface": "off",
-        "@typescript-eslint/no-empty-function": ["error", { "allow": ["constructors"] }]
+        "@typescript-eslint/no-empty-function": ["error", { "allow": ["constructors"] }],
+        "@typescript-eslint/prefer-readonly-parameter-types": "off"
       }
     }
   ]
