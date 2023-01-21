@@ -1,12 +1,11 @@
 import { Game } from 'components/game'
-import { createBoard } from 'lib/board'
 
 const Index = () => {
-  const board = createBoard(50)
+  const maxGuessableNumber = 100
 
   return (
     <div className="h-full">
-      <Game board={board} />
+      <Game maxGuessableNumber={maxGuessableNumber} />
     </div>
   )
 }
